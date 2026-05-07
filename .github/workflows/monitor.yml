@@ -1,0 +1,85 @@
+# Monitor IBS/CBS — GitHub Actions
+# =================================
+# Executa o agente automaticamente:
+#   - Todo dia útil às 08:00 e 18:00 (horário de Brasília = UTC-3)
+#   - Disparo manual via workflow_dispatch
+#
+# Secrets necessários (Settings → Secrets → Actions):
+#   ANTHROPIC_API_KEY  — chave da API Anthropic
+#   SMTP_USER          — seu e-mail Gmail (ex: seunome@gmail.com)
+#   SMTP_PASS          — senha de app do Gmail (não a senha normal)
+#   EMAIL_DESTINO      — e-mail que receberá os alertas
+
+name: Monitor IBS/CBS
+
+on:
+  schedule:
+    # 08:00 BRT = 11:00 UTC (seg a sex)
+    - cron: "0 11 * * 1-5"
+    # 18:00 BRT = 21:00 UTC (seg a sex)
+    - cron: "0 21 * * 1-5"
+
+  # Permite disparar manualmente pela aba Actions do GitHub
+  workflow_dispatch:
+    inputs:
+      forcar_email:
+        description: "Forçar envio de e-mail mesmo sem normas novas?"
+        required: false
+        default: "false"
+        type: choice
+        options: ["true", "false"]
+
+jobs:
+  monitorar:
+    name: Executar agente de monitoramento
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # ── 1. Checkout do repositório ──────────────────────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── 2. Cache do banco SQLite entre execuções ────────────────────
+      # O banco é persistido entre runs para não reprocessar normas já vistas.
+      - name: Restaurar banco de dados (cache)
+        uses: actions/cache@v4
+        with:
+          path: data/ibs_cbs.db
+          key: ibs-cbs-db-${{ github.run_number }}
+          restore-keys: |
+            ibs-cbs-db-
+
+      # ── 3. Python ───────────────────────────────────────────────────
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      # ── 4. Dependências ─────────────────────────────────────────────
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      # ── 5. Executar o agente ────────────────────────────────────────
+      - name: Executar Monitor IBS/CBS
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SMTP_HOST:         smtp.gmail.com
+          SMTP_PORT:         587
+          SMTP_USER:         ${{ secrets.SMTP_USER }}
+          SMTP_PASS:         ${{ secrets.SMTP_PASS }}
+          EMAIL_DESTINO:     ${{ secrets.EMAIL_DESTINO }}
+          EMAIL_FROM:        ${{ secrets.SMTP_USER }}
+          FORCAR_EMAIL:      ${{ inputs.forcar_email || 'false' }}
+        run: python src/agent.py
+
+      # ── 6. Salva log e banco como artefato (30 dias) ─────────────────
+      - name: Upload de artefatos (log + banco)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ibs-cbs-run-${{ github.run_number }}
+          path: |
+            data/ibs_cbs.db
+          retention-days: 30
