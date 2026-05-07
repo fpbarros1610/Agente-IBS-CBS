@@ -1,0 +1,28 @@
+# Segurança — NUNCA versionar estes arquivos
+.env
+*.env
+
+# Banco de dados local (gerenciado pelo cache do GitHub Actions)
+data/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS
+.DS_Store

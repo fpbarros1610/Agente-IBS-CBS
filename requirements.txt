@@ -1,0 +1,8 @@
+# Monitor IBS/CBS — Dependências Python
+# Instale com: pip install -r requirements.txt
+
+anthropic>=0.49.0        # SDK oficial Anthropic
+requests>=2.31.0         # HTTP client para scraping e APIs
+beautifulsoup4>=4.12.0   # Parser HTML para scraping
+python-dotenv>=1.0.0     # Carrega variáveis de .env em desenvolvimento
+lxml>=5.0.0              # Parser XML/HTML alternativo (mais robusto)
