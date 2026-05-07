@@ -78,10 +78,11 @@ FONTES = [
         "tipo": "rfb",
     },
     {
-        "nome": "DOU — API Querido Diário (IBS/CBS)",
+        "nome": "DOU — API Querido Diario (IBS CBS)",
         "url": (
-            "https://queridodiario.ok.org.br/api/gazettes"
-            "?querystring=IBS+CBS&level=federal&size=10&sort_by=date"
+            "https://api.queridodiario.ok.org.br/gazettes"
+            "?querystring=IBS+CBS+reforma+tributaria"
+            "&excerpt_size=500&number_of_excerpts=3&size=10"
         ),
         "seletor": None,
         "tipo": "api_dou",
@@ -114,19 +115,21 @@ FONTES = [
         "seletor": "a",
         "tipo": "portal_nfe",
     },
-    # ── NFC-e ───────────────────────────────────────────────────────────
+    # ── NFC-e — portal nacional (substitui SP que retorna 500) ─────────
     {
-        "nome": "Portal NFC-e — Notas Técnicas",
-        "url": "https://www.nfce.fazenda.sp.gov.br/NFCePortal/Paginas/Documentos.aspx",
+        "nome": "Portal NFC-e — Documentos Tecnicos",
+        "url": "https://www.nfce.fazenda.gov.br/portal/listaConteudo.aspx",
         "seletor": "a",
         "tipo": "portal_nfce",
     },
-    # ── ENCAT / SINIEF ──────────────────────────────────────────────────
+    # ── ENCAT / SINIEF — via DOU (encat.org tem timeout recorrente) ─────
+    # Monitorado via DOU Querido Diario abaixo — fonte ENCAT removida
+    # ── Portal Consumo Tributos (CBS + IBS) ─────────────────────────────
     {
-        "nome": "ENCAT — Ajustes SINIEF e Atos",
-        "url": "https://www.encat.org/atos/ajustes-sinief/",
+        "nome": "Portal Nacional Tributos Consumo CBS IBS",
+        "url": "https://consumo.tributos.gov.br",
         "seletor": "a",
-        "tipo": "encat",
+        "tipo": "portal_consumo",
     },
     {
         "nome": "SEFAZ — Documentos Fiscais Eletrônicos",
@@ -136,7 +139,17 @@ FONTES = [
     },
     # ── Receita Federal — Atos infralegais ─────────────────────────────
     {
-        "nome": "Receita Federal — Reforma Tributária Consumo",
+        "nome": "Receita Federal — Programa Reforma Tributaria Consumo",
+        "url": (
+            "https://www.gov.br/receitafederal/pt-br/acesso-a-informacao"
+            "/acoes-e-programas/programas-e-atividades/reforma-consumo"
+            "/orientacoes-2026"
+        ),
+        "seletor": "a",
+        "tipo": "rfb_legislacao",
+    },
+    {
+        "nome": "Receita Federal — Marcos Regulatorios IBS CBS",
         "url": (
             "https://www.gov.br/receitafederal/pt-br/acesso-a-informacao"
             "/acoes-e-programas/programas-e-atividades/reforma-consumo"
@@ -160,8 +173,9 @@ FONTES = [
     {
         "nome": "DOU — API Querido Diário (Nota Técnica NF-e)",
         "url": (
-            "https://queridodiario.ok.org.br/api/gazettes"
-            "?querystring=nota+tecnica+NF-e&level=federal&size=10&sort_by=date"
+            "https://api.queridodiario.ok.org.br/gazettes"
+            "?querystring=nota+tecnica+NF-e+leiaute+IBS+CBS"
+            "&excerpt_size=500&number_of_excerpts=3&size=10"
         ),
         "seletor": None,
         "tipo": "api_dou",
@@ -169,8 +183,9 @@ FONTES = [
     {
         "nome": "DOU — API Querido Diário (SINIEF)",
         "url": (
-            "https://queridodiario.ok.org.br/api/gazettes"
-            "?querystring=SINIEF+reforma+tributaria&level=federal&size=10&sort_by=date"
+            "https://api.queridodiario.ok.org.br/gazettes"
+            "?querystring=SINIEF+ajuste+IBS+CBS"
+            "&excerpt_size=500&number_of_excerpts=3&size=10"
         ),
         "seletor": None,
         "tipo": "api_dou",
@@ -178,8 +193,9 @@ FONTES = [
     {
         "nome": "DOU — API Querido Diário (Portaria Fazenda)",
         "url": (
-            "https://queridodiario.ok.org.br/api/gazettes"
-            "?querystring=portaria+fazenda+IBS+CBS&level=federal&size=10&sort_by=date"
+            "https://api.queridodiario.ok.org.br/gazettes"
+            "?querystring=portaria+IBS+CBS+reforma+tributaria"
+            "&excerpt_size=500&number_of_excerpts=3&size=10"
         ),
         "seletor": None,
         "tipo": "api_dou",
@@ -187,8 +203,9 @@ FONTES = [
     {
         "nome": "DOU — API Querido Diário (Instrução Normativa RFB)",
         "url": (
-            "https://queridodiario.ok.org.br/api/gazettes"
-            "?querystring=instrucao+normativa+RFB+IBS&level=federal&size=10&sort_by=date"
+            "https://api.queridodiario.ok.org.br/gazettes"
+            "?querystring=instrucao+normativa+CBS+IBS+CGIBS"
+            "&excerpt_size=500&number_of_excerpts=3&size=10"
         ),
         "seletor": None,
         "tipo": "api_dou",
