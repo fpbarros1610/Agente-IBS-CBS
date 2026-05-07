@@ -2,7 +2,7 @@ name: Monitor IBS/CBS
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "0 8 * * 1-5"
   workflow_dispatch:
     inputs:
       forcar_email:
