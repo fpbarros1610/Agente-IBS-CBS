@@ -10,6 +10,10 @@ Fontes monitoradas:
   - Portal CGIBS (cgibs.gov.br)
   - Receita Federal (gov.br/fazenda)
   - Portal da Reforma Tributária (reformatributaria.com)
+  - Portal Nacional NF-e — Notas Técnicas e Documentos (nfe.fazenda.gov.br)
+  - Portal NFC-e — Notas Técnicas (nfce.fazenda.gov.br)
+  - ENCAT — Encontro Nacional de Coordenadores e Administradores Tributários
+  - SEFAZ Nacional — Ajustes SINIEF e documentos fiscais
 
 Dependências (ver requirements.txt):
   anthropic, requests, beautifulsoup4, python-dotenv
@@ -48,6 +52,7 @@ MAX_TOKENS       = 2048
 REQUEST_TIMEOUT  = 20  # segundos
 
 FONTES = [
+    # ── Legislação federal ──────────────────────────────────────────────
     {
         "nome": "Planalto — Leis Complementares",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/lcp/",
@@ -73,7 +78,7 @@ FONTES = [
         "tipo": "rfb",
     },
     {
-        "nome": "DOU — API Querido Diário (IBS)",
+        "nome": "DOU — API Querido Diário (IBS/CBS)",
         "url": (
             "https://queridodiario.ok.org.br/api/gazettes"
             "?querystring=IBS+CBS&level=federal&size=10&sort_by=date"
@@ -81,13 +86,143 @@ FONTES = [
         "seletor": None,
         "tipo": "api_dou",
     },
+    # ── Portal Nacional NF-e ────────────────────────────────────────────
+    {
+        "nome": "Portal NF-e — Notas Técnicas",
+        "url": (
+            "https://www.nfe.fazenda.gov.br/portal/"
+            "listaConteudo.aspx?tipoConteudo=ONZGSWKrYCo="
+        ),
+        "seletor": "a",
+        "tipo": "portal_nfe",
+    },
+    {
+        "nome": "Portal NF-e — Documentos e Informativos",
+        "url": (
+            "https://www.nfe.fazenda.gov.br/portal/"
+            "listaConteudo.aspx?tipoConteudo=Ox4DsKSHB7o="
+        ),
+        "seletor": "a",
+        "tipo": "portal_nfe",
+    },
+    {
+        "nome": "Portal NF-e — Manuais e Orientações",
+        "url": (
+            "https://www.nfe.fazenda.gov.br/portal/"
+            "listaConteudo.aspx?tipoConteudo=tW6dOCHUsWk="
+        ),
+        "seletor": "a",
+        "tipo": "portal_nfe",
+    },
+    # ── NFC-e ───────────────────────────────────────────────────────────
+    {
+        "nome": "Portal NFC-e — Notas Técnicas",
+        "url": "https://www.nfce.fazenda.sp.gov.br/NFCePortal/Paginas/Documentos.aspx",
+        "seletor": "a",
+        "tipo": "portal_nfce",
+    },
+    # ── ENCAT / SINIEF ──────────────────────────────────────────────────
+    {
+        "nome": "ENCAT — Ajustes SINIEF e Atos",
+        "url": "https://www.encat.org/atos/ajustes-sinief/",
+        "seletor": "a",
+        "tipo": "encat",
+    },
+    {
+        "nome": "SEFAZ — Documentos Fiscais Eletrônicos",
+        "url": "https://www.nfe.fazenda.gov.br/portal/principal.aspx",
+        "seletor": "a",
+        "tipo": "sefaz",
+    },
+    # ── Receita Federal — Atos infralegais ─────────────────────────────
+    {
+        "nome": "Receita Federal — Legislação Tributária",
+        "url": "https://www.gov.br/receitafederal/pt-br/assuntos/legislacao",
+        "seletor": "a",
+        "tipo": "rfb_legislacao",
+    },
+    {
+        "nome": "Receita Federal — Instruções Normativas",
+        "url": (
+            "https://www.gov.br/receitafederal/pt-br/assuntos/legislacao"
+            "/instrucoes-normativas"
+        ),
+        "seletor": "a",
+        "tipo": "rfb_in",
+    },
+    {
+        "nome": "Ministério da Fazenda — Portarias e Atos",
+        "url": "https://www.gov.br/fazenda/pt-br/acesso-a-informacao/legislacao",
+        "seletor": "a",
+        "tipo": "mf_portarias",
+    },
+    # ── DOU — buscas adicionais por tipo de ato ─────────────────────────
+    {
+        "nome": "DOU — API Querido Diário (Nota Técnica NF-e)",
+        "url": (
+            "https://queridodiario.ok.org.br/api/gazettes"
+            "?querystring=nota+tecnica+NF-e&level=federal&size=10&sort_by=date"
+        ),
+        "seletor": None,
+        "tipo": "api_dou",
+    },
+    {
+        "nome": "DOU — API Querido Diário (SINIEF)",
+        "url": (
+            "https://queridodiario.ok.org.br/api/gazettes"
+            "?querystring=SINIEF+reforma+tributaria&level=federal&size=10&sort_by=date"
+        ),
+        "seletor": None,
+        "tipo": "api_dou",
+    },
+    {
+        "nome": "DOU — API Querido Diário (Portaria Fazenda)",
+        "url": (
+            "https://queridodiario.ok.org.br/api/gazettes"
+            "?querystring=portaria+fazenda+IBS+CBS&level=federal&size=10&sort_by=date"
+        ),
+        "seletor": None,
+        "tipo": "api_dou",
+    },
+    {
+        "nome": "DOU — API Querido Diário (Instrução Normativa RFB)",
+        "url": (
+            "https://queridodiario.ok.org.br/api/gazettes"
+            "?querystring=instrucao+normativa+RFB+IBS&level=federal&size=10&sort_by=date"
+        ),
+        "seletor": None,
+        "tipo": "api_dou",
+    },
 ]
 
+# Termos que identificam conteúdo relevante para IBS/CBS/NF-e
 TERMOS_ALVO = [
+    # Tributos novos
     "IBS", "CBS", "imposto sobre bens e serviços",
     "contribuição sobre bens e serviços", "reforma tributária",
     "LC 214", "LC 227", "CGIBS", "split payment", "imposto seletivo",
     "RCBS", "RIBS", "Decreto 12.955", "Resolução CGIBS",
+    # Documentos fiscais eletrônicos
+    "nota técnica", "NT 2025", "NT 2026", "NF-e", "NFC-e", "CT-e", "NFS-e",
+    "leiaute", "layout", "validação", "CST", "cClassTrib",
+    "ajuste SINIEF", "SINIEF", "ENCAT", "documento fiscal eletrônico",
+    "DeRE", "declaração de regimes específicos",
+    # Obrigações acessórias e atos conjuntos
+    "obrigação acessória", "obrigações acessórias",
+    "ato conjunto", "portaria conjunta",
+    # Atos infralegais — todos os tipos monitorados
+    "instrução normativa", "portaria", "despacho", "resolução",
+    "decreto", "regulamento", "medida provisória",
+    "parecer normativo", "solução de consulta", "solução de divergência",
+    "ato declaratório", "ato interpretativo",
+    # Temas específicos IBS/CBS
+    "não cumulatividade", "base de cálculo", "alíquota",
+    "fato gerador", "sujeito passivo", "crédito tributário",
+    "regime específico", "regime diferenciado", "cashback",
+    "zona franca", "simples nacional", "MEI",
+    "bens de capital", "ativo imobilizado", "imóvel",
+    "serviços financeiros", "combustíveis", "cesta básica",
+    "comitê gestor", "Receita Federal", "PGFN",
 ]
 
 
@@ -160,24 +295,28 @@ def analisar_norma(cliente: Anthropic, titulo: str, url: str, fonte: str) -> dic
     Usa a API Claude para analisar e resumir uma norma.
     Retorna dict com tipo, ementa, pontos_principais, impacto e relevancia.
     """
-    prompt = f"""Você é um especialista em direito tributário brasileiro com foco na Reforma Tributária do Consumo (EC 132/2023, LC 214/2025).
+    prompt = f"""Você é um especialista em direito tributário brasileiro com foco na Reforma Tributária do Consumo (EC 132/2023, LC 214/2025) e em documentos fiscais eletrônicos (NF-e, NFC-e, CT-e, NFS-e).
 
-Analise a seguinte norma e retorne um JSON com a estrutura abaixo.
+Analise o seguinte ato normativo ou regulatório e retorne um JSON com a estrutura abaixo.
+Considere qualquer tipo de norma: lei, decreto, regulamento, resolução, portaria, instrução normativa,
+ato conjunto, nota técnica, ajuste SINIEF, despacho, parecer normativo, solução de consulta, etc.
 Caso não seja possível identificar com certeza algum campo, use null.
 
-Norma:
+Norma/Ato:
 - Título: {titulo}
 - URL: {url}
 - Fonte: {fonte}
 
 Estrutura JSON esperada (retorne APENAS o JSON, sem markdown):
 {{
-  "tipo": "lei_complementar|decreto|resolucao|ato_conjunto|portaria|instrucao_normativa|nota_tecnica|outro",
+  "tipo": "lei_complementar|lei_ordinaria|emenda_constitucional|decreto|medida_provisoria|resolucao|portaria|instrucao_normativa|ato_conjunto|ato_declaratorio|parecer_normativo|solucao_consulta|nota_tecnica|ajuste_sinief|informe_tecnico|despacho|circular|outro",
   "numero": "número/ano da norma ou null",
   "data_publicacao": "DD/MM/AAAA ou null",
+  "orgao_emissor": "RFB|CGIBS|MF|SEFAZ|ENCAT|Planalto|outro",
   "ementa": "resumo de 1 a 2 frases do que a norma trata",
   "pontos_principais": ["ponto 1", "ponto 2", "ponto 3"],
-  "tributos_afetados": ["IBS", "CBS", "IS"],
+  "tributos_afetados": ["IBS", "CBS", "IS", "PIS", "COFINS", "ICMS", "ISS", "IPI"],
+  "documentos_fiscais": ["NF-e", "NFC-e", "CT-e", "NFS-e"],
   "impacto": "alto|medio|baixo",
   "urgencia": "imediata|curto_prazo|medio_prazo",
   "relevancia_score": 1,
@@ -185,10 +324,12 @@ Estrutura JSON esperada (retorne APENAS o JSON, sem markdown):
 }}
 
 Critérios de relevância (1-10):
-- 10: Lei Complementar ou Decreto regulamentador principal
-- 8-9: Resolução CGIBS, Ato Conjunto RFB/CGIBS, Portaria com impacto operacional
-- 5-7: Instrução Normativa, Nota Técnica, orientação administrativa
-- 1-4: Notícia ou referência indireta sem força normativa
+- 10: Emenda Constitucional, Lei Complementar ou Decreto regulamentador principal
+- 8-9: Resolução CGIBS, Ato Conjunto RFB/CGIBS, Portaria com impacto operacional direto
+- 6-7: Instrução Normativa RFB, Nota Técnica NF-e/NFC-e/CT-e, Ajuste SINIEF, Informe Técnico fiscal
+- 4-5: Portaria de procedimento, Ato Declaratório, Solução de Consulta com tese relevante
+- 2-3: Despacho, Circular, orientação interna de menor abrangência
+- 1: Conteúdo sem relação direta com IBS, CBS ou documentos fiscais da reforma
 """
     try:
         resp = cliente.messages.create(
@@ -288,7 +429,8 @@ EMAIL_HTML_TEMPLATE = """
     As informações são extraídas de fontes oficiais (DOU, Planalto, CGIBS, RFB)
     e analisadas por IA. Verifique sempre o texto oficial antes de tomar decisões.</p>
     <p>Fontes monitoradas: DOU Federal • planalto.gov.br • cgibs.gov.br •
-    gov.br/fazenda • reformatributaria.com</p>
+    gov.br/fazenda • reformatributaria.com • nfe.fazenda.gov.br (NF-e) •
+    encat.org (SINIEF) • nfce (NFC-e)</p>
   </div>
 </div>
 </body>
@@ -323,10 +465,13 @@ def _build_card(norma: dict) -> str:
         pontos_html = f'<ul class="pontos">{items}</ul>'
 
     tributos = analise.get("tributos_afetados", []) or []
-    tributos_html = ""
-    if tributos:
+    docs_fiscais = analise.get("documentos_fiscais", []) or []
+    chips_html = ""
+    if tributos or docs_fiscais:
         chips = "".join(f'<span class="chip">{t}</span>' for t in tributos)
-        tributos_html = f'<div style="margin-top:8px">{chips}</div>'
+        chips += "".join(f'<span class="chip" style="background:#EEF2FF;color:#3730A3">{d}</span>'
+                         for d in docs_fiscais)
+        chips_html = f'<div style="margin-top:8px">{chips}</div>'
 
     url = norma.get("url", "")
     link_html = (f'<a href="{url}" class="btn">Acessar norma →</a>'
@@ -345,7 +490,7 @@ def _build_card(norma: dict) -> str:
         data_pub=analise.get("data_publicacao") or "—",
         tipo=(analise.get("tipo") or "outro").replace("_", " ").title(),
         fonte=norma.get("fonte", "—")[:60],
-        tributos_html=tributos_html,
+        tributos_html=chips_html,
         link_html=link_html,
     )
 
@@ -438,13 +583,13 @@ def executar() -> None:
         score   = analise.get("relevancia_score", 1)
         log.info("  → Score de relevância: %s/10 | Impacto: %s",
                  score, analise.get("impacto"))
-        if score >= 4:  # Filtra ruído — apenas normas com score >= 4
+        if score >= 3:  # Captura todos os atos com alguma relevância (score ≥ 3)
             normas_para_salvar.append({**item, "analise": analise})
 
-    log.info("Normas relevantes (score ≥ 4): %d", len(normas_para_salvar))
+    log.info("Normas/atos relevantes (score ≥ 3): %d", len(normas_para_salvar))
 
     if not normas_para_salvar:
-        log.info("Candidatos encontrados, mas nenhum com relevância suficiente.")
+        log.info("Candidatos encontrados, mas nenhum com relevância suficiente (score < 3).")
         db.registrar_execucao(normas_encontradas=0, email_enviado=False)
         return
 
@@ -466,7 +611,11 @@ def executar() -> None:
             impacto      = n["analise"].get("impacto", "baixo"),
             urgencia     = n["analise"].get("urgencia", "medio_prazo"),
             score        = n["analise"].get("relevancia_score", 1),
-            observacoes  = n["analise"].get("observacoes"),
+            observacoes  = (
+                f"Órgão: {n['analise'].get('orgao_emissor', '—')} | "
+                f"Docs fiscais: {', '.join(n['analise'].get('documentos_fiscais') or []) or '—'} | "
+                + (n["analise"].get("observacoes") or "")
+            ).strip(" |"),
         )
         log.info("Salvo: %s", n["titulo"][:80])
 
