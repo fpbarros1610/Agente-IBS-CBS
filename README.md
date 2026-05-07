@@ -163,6 +163,7 @@ RFB/CGIBS nº 1/2025 + arts. 619 RCBS e 617 RIBS).
 
 ## Aviso legal
 
+
 As informações são extraídas de fontes oficiais e analisadas por IA.
 Sempre verifique o texto original das normas antes de tomar decisões jurídicas
 ou operacionais. Este projeto não substitui assessoria jurídica especializada.
