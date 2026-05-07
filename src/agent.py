@@ -43,7 +43,7 @@ log = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Configuração central
 # ---------------------------------------------------------------------------
-ANTHROPIC_MODEL = "claude-sonnet-4-20250514"
+ANTHROPIC_MODEL = "claude-sonnet-4-5"
 MAX_TOKENS       = 2048
 REQUEST_TIMEOUT  = 20  # segundos
 
