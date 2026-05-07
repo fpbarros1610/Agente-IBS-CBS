@@ -38,12 +38,12 @@ jobs:
     steps:
       # ── 1. Checkout do repositório ──────────────────────────────────
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       # ── 2. Cache do banco SQLite entre execuções ────────────────────
       # O banco é persistido entre runs para não reprocessar normas já vistas.
       - name: Restaurar banco de dados (cache)
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.2
         with:
           path: data/ibs_cbs.db
           key: ibs-cbs-db-${{ github.run_number }}
@@ -52,7 +52,7 @@ jobs:
 
       # ── 3. Python ───────────────────────────────────────────────────
       - name: Configurar Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5.4.0
         with:
           python-version: "3.12"
           cache: "pip"
@@ -77,7 +77,7 @@ jobs:
       # ── 6. Salva log e banco como artefato (30 dias) ─────────────────
       - name: Upload de artefatos (log + banco)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: ibs-cbs-run-${{ github.run_number }}
           path: |
