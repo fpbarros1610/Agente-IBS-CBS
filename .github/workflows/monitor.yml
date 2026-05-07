@@ -3,11 +3,10 @@ name: Monitor IBS/CBS
 on:
   schedule:
     - cron: "0 8 * * 1-5"
-
   workflow_dispatch:
     inputs:
       forcar_email:
-        description: "Forçar envio de e-mail mesmo sem normas novas?"
+        description: "Forcar envio de e-mail mesmo sem normas novas?"
         required: false
         default: "false"
         type: choice
@@ -40,7 +39,7 @@ jobs:
           python-version: "3.12"
           cache: "pip"
 
-      - name: Instalar dependências
+      - name: Instalar dependencias
         run: pip install -r requirements.txt
 
       - name: Executar Monitor IBS/CBS
