@@ -136,24 +136,24 @@ FONTES = [
     },
     # ── Receita Federal — Atos infralegais ─────────────────────────────
     {
-        "nome": "Receita Federal — Legislação Tributária",
-        "url": "https://www.gov.br/receitafederal/pt-br/assuntos/legislacao",
+        "nome": "Receita Federal — Reforma Tributária Consumo",
+        "url": (
+            "https://www.gov.br/receitafederal/pt-br/acesso-a-informacao"
+            "/acoes-e-programas/programas-e-atividades/reforma-consumo"
+        ),
         "seletor": "a",
         "tipo": "rfb_legislacao",
     },
     {
-        "nome": "Receita Federal — Instruções Normativas",
-        "url": (
-            "https://www.gov.br/receitafederal/pt-br/assuntos/legislacao"
-            "/instrucoes-normativas"
-        ),
-        "seletor": "a",
-        "tipo": "rfb_in",
+        "nome": "Receita Federal — Notícias recentes",
+        "url": "https://www.gov.br/receitafederal/pt-br/assuntos/noticias",
+        "seletor": "article a, h2 a, h3 a, .summary a",
+        "tipo": "rfb_noticias",
     },
     {
-        "nome": "Ministério da Fazenda — Portarias e Atos",
-        "url": "https://www.gov.br/fazenda/pt-br/acesso-a-informacao/legislacao",
-        "seletor": "a",
+        "nome": "Ministério da Fazenda — Notícias Reforma Tributária",
+        "url": "https://www.gov.br/fazenda/pt-br/assuntos/noticias",
+        "seletor": "article a, h2 a, h3 a",
         "tipo": "mf_portarias",
     },
     # ── DOU — buscas adicionais por tipo de ato ─────────────────────────
@@ -196,33 +196,40 @@ FONTES = [
 ]
 
 # Termos que identificam conteúdo relevante para IBS/CBS/NF-e
-TERMOS_ALVO = [
-    # Tributos novos
+# Termos OBRIGATÓRIOS — pelo menos UM deve aparecer no título/URL para o link ser aceito.
+# São específicos o suficiente para evitar ruído de páginas genéricas.
+TERMOS_OBRIGATORIOS = [
+    # Tributos da reforma — alta especificidade
     "IBS", "CBS", "imposto sobre bens e serviços",
     "contribuição sobre bens e serviços", "reforma tributária",
     "LC 214", "LC 227", "CGIBS", "split payment", "imposto seletivo",
     "RCBS", "RIBS", "Decreto 12.955", "Resolução CGIBS",
-    # Documentos fiscais eletrônicos
-    "nota técnica", "NT 2025", "NT 2026", "NF-e", "NFC-e", "CT-e", "NFS-e",
-    "leiaute", "layout", "validação", "CST", "cClassTrib",
-    "ajuste SINIEF", "SINIEF", "ENCAT", "documento fiscal eletrônico",
     "DeRE", "declaração de regimes específicos",
-    # Obrigações acessórias e atos conjuntos
+    # Documentos fiscais eletrônicos — específicos
+    "nota técnica", "NT 2025", "NT 2026",
+    "leiaute", "cClassTrib", "ajuste SINIEF", "SINIEF", "ENCAT",
+    "documento fiscal eletrônico", "NF-e", "NFC-e", "CT-e", "NFS-e",
+    # Obrigações e atos conjuntos
     "obrigação acessória", "obrigações acessórias",
     "ato conjunto", "portaria conjunta",
-    # Atos infralegais — todos os tipos monitorados
+    # Temas tributários específicos IBS/CBS
+    "não cumulatividade", "split payment", "cashback",
+    "zona franca", "simples nacional",
+    "bens de capital", "ativo imobilizado",
+    "regime específico", "regime diferenciado",
+    "comitê gestor", "PGFN",
+]
+
+# Termos CONTEXTUAIS — usados apenas em combinação com TERMOS_OBRIGATORIOS
+# para enriquecer a análise, mas NÃO sozinhos para aceitar um link.
+TERMOS_ALVO = TERMOS_OBRIGATORIOS + [
     "instrução normativa", "portaria", "despacho", "resolução",
     "decreto", "regulamento", "medida provisória",
     "parecer normativo", "solução de consulta", "solução de divergência",
     "ato declaratório", "ato interpretativo",
-    # Temas específicos IBS/CBS
-    "não cumulatividade", "base de cálculo", "alíquota",
-    "fato gerador", "sujeito passivo", "crédito tributário",
-    "regime específico", "regime diferenciado", "cashback",
-    "zona franca", "simples nacional", "MEI",
-    "bens de capital", "ativo imobilizado", "imóvel",
-    "serviços financeiros", "combustíveis", "cesta básica",
-    "comitê gestor", "Receita Federal", "PGFN",
+    "base de cálculo", "alíquota", "fato gerador", "sujeito passivo",
+    "crédito tributário", "serviços financeiros", "combustíveis", "cesta básica",
+    "imóvel", "MEI",
 ]
 
 
@@ -246,10 +253,13 @@ def buscar_links_html(fonte: dict) -> list[dict]:
         for el in elementos:
             href = el.get("href", "")
             texto = el.get_text(strip=True)
-            if not href or len(texto) < 10:
+            if not href or len(texto) < 15:
                 continue
-            # Filtra apenas links relacionados aos termos-alvo
+            # Pré-filtro rigoroso: exige ao menos 1 termo obrigatório no título/URL
+            # Isso evita ruído de páginas genéricas do portal gov.br
             texto_lower = (texto + " " + href).lower()
+            if not any(t.lower() in texto_lower for t in TERMOS_OBRIGATORIOS):
+                continue
             if any(t.lower() in texto_lower for t in TERMOS_ALVO):
                 url_completa = href if href.startswith("http") else (
                     fonte["url"].rstrip("/") + "/" + href.lstrip("/")
@@ -274,7 +284,7 @@ def buscar_api_dou(fonte: dict) -> list[dict]:
         dados = r.json()
         for g in dados.get("gazettes", []):
             for excerpt in g.get("excerpts", []):
-                if any(t.lower() in excerpt.lower() for t in TERMOS_ALVO):
+                if any(t.lower() in excerpt.lower() for t in TERMOS_OBRIGATORIOS):
                     links.append({
                         "titulo": excerpt[:300],
                         "url": g.get("url", fonte["url"]),
